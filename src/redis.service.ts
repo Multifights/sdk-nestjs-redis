@@ -53,4 +53,22 @@ export class RedisService {
         }
         return undefined;
     }
+
+    async delete(key: string): Promise<number> {
+        try {
+            return await this.redis.del(key);
+        } catch (error) {
+            if (error instanceof Error) {
+                this.logger.error('RedisCache - An error occurred while trying to delete from redis cache.', {
+                  cacheKey: key,
+                  error: error?.toString(),
+                });
+              }
+        }
+        return 0;
+    }
+
+    async expire(key: string, ttl: number): Promise<number> {
+        return await this.redis.expire(key, ttl);
+    }
 }
