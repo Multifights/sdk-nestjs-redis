@@ -122,6 +122,27 @@ export class RedisService {
         return;
     }
 
+    async hmget<T>(hash: string, fields: string[]): Promise<(T | null)[]> {
+        try {
+            const results = await this.redis.hmget(hash, ...fields);
+
+            if (results.length > 0) {
+                return results.map((value) => {
+                    if(value !== null) return JSON.parse(value);
+                        else return null;
+                });
+            }
+        } catch (error) {
+            if (error instanceof Error) {
+                this.logger.error('An error occurred while trying to hget from redis.', {
+                  hash, fields,
+                  exception: error?.toString(),
+                });
+            }
+        }
+        return [];
+    }
+
     async hgetall<T>(hash: string): Promise<Record<string, T> | undefined> {
         try {
             const data = await this.redis.hgetall(hash);
