@@ -68,6 +68,19 @@ export class RedisService {
         return 0;
     }
 
+    async deleteMany(keys: string[]): Promise<number> {
+        try {
+         return await this.redis.del(keys);
+        } catch (error) {
+          if (error instanceof Error) {
+            this.logger.error('An error occurred while trying to delete multiple keys from redis cache.', {
+              error: error?.toString(),
+            });
+          }
+        }
+        return 0;
+      }
+
     async expire(key: string, ttl: number): Promise<number> {
         return await this.redis.expire(key, ttl);
     }
