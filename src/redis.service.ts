@@ -161,9 +161,9 @@ export class RedisService {
         }
     }
 
-    async hmset<T>(hash: string, values: T[], ttl: number): Promise<"OK" | undefined> {
+    async hmset(hash: string, values: string[]): Promise<"OK" | undefined> {
         try {
-            return await this.redis.hmset(hash, [...values, 'EX', ttl]);
+            return await this.redis.hmset(hash, ...values);
         } catch (error) {
             if (error instanceof Error) {
                 this.logger.error('An error occurred while trying to hset in redis.', {
