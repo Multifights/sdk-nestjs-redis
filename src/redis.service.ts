@@ -79,7 +79,17 @@ export class RedisService {
           }
         }
         return 0;
-      }
+    }
+
+    async getOrSet<T>(key: string, value: T, ttl: number, cacheNullable: boolean = true): Promise<T> {
+        const cachedData = await this.get<T>(key);
+        if (cachedData !== undefined) {
+            return cachedData;
+        }
+
+        await this.set<T>(key, value, ttl, cacheNullable);
+        return value;
+    }
 
     async expire(key: string, ttl: number): Promise<number> {
         return await this.redis.expire(key, ttl);
