@@ -122,6 +122,28 @@ export class RedisService {
         return;
     }
 
+    async hgetall<T>(hash: string): Promise<Record<string, T> | undefined> {
+        try {
+            const data = await this.redis.hgetall(hash);
+            if(!data) return;
+
+            const response: Record<string, T> = {};
+            for(const key of Object.keys(data)) {
+                response[key] = JSON.parse(data[key]);
+            }
+
+            return response;
+        } catch (error) {
+            if (error instanceof Error) {
+                this.logger.error('An error occurred while trying to hgetall from redis.', {
+                  hash,
+                  exception: error?.toString(),
+                });
+            }
+        }
+        return;
+    }
+
     async expire(key: string, ttl: number): Promise<number> {
         return await this.redis.expire(key, ttl);
     }
