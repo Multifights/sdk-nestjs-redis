@@ -144,6 +144,37 @@ export class RedisService {
         return;
     }
 
+    async hset<T>(hash: string, field: string, value: T, cacheNullable: boolean = true): Promise<number> {
+        try {
+            if (!cacheNullable && value == null) {
+                return 0;
+            }
+            return await this.redis.hset(hash, field, JSON.stringify(value));
+        } catch (error) {
+            if (error instanceof Error) {
+                this.logger.error('An error occurred while trying to hset in redis.', {
+                  hash, field, value,
+                  exception: error?.toString(),
+                });
+            }
+            throw error;
+        }
+    }
+
+    async hmset<T>(hash: string, values: T[], ttl: number): Promise<"OK" | undefined> {
+        try {
+            return await this.redis.hmset(hash, [...values, 'EX', ttl]);
+        } catch (error) {
+            if (error instanceof Error) {
+                this.logger.error('An error occurred while trying to hset in redis.', {
+                  hash, values,
+                  exception: error?.toString(),
+                });
+            }
+            throw error;
+        }
+    }
+
     async expire(key: string, ttl: number): Promise<number> {
         return await this.redis.expire(key, ttl);
     }
