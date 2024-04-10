@@ -91,6 +91,37 @@ export class RedisService {
         return value;
     }
 
+    async scan(pattern: string): Promise<string[]> {
+        const found: string[] = [];
+        let cursor = '0';
+        do {
+          const reply = await this.redis.scan(cursor, 'MATCH', pattern);
+    
+          cursor = reply[0];
+          found.push(...reply[1]);
+        } while (cursor !== '0');
+    
+        return found;
+    }
+
+    async hget<T>(hash: string, field: string): Promise<T | undefined> {
+        try {
+            const data = await this.redis.hget(hash, field);
+
+            if(data) {
+                return JSON.parse(data);
+            }
+        } catch (error) {
+            if (error instanceof Error) {
+                this.logger.error('An error occurred while trying to hget from redis.', {
+                  hash, field,
+                  exception: error?.toString(),
+                });
+            }
+        }
+        return;
+    }
+
     async expire(key: string, ttl: number): Promise<number> {
         return await this.redis.expire(key, ttl);
     }
