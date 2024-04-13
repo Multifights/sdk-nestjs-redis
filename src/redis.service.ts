@@ -196,6 +196,20 @@ export class RedisService {
         }
     }
 
+    async hdel(hash: string, fields: string[]): Promise<number> {
+        try {
+            return await this.redis.hdel(hash, ...fields);
+        } catch (error) {
+            if (error instanceof Error) {
+                this.logger.error('An error occurred while trying to hdel in redis.', {
+                  hash, fields,
+                  exception: error?.toString(),
+                });
+            }
+            throw error;
+        }
+    }
+
     async expire(key: string, ttl: number): Promise<number> {
         return await this.redis.expire(key, ttl);
     }
