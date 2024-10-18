@@ -250,6 +250,54 @@ export class RedisService {
     }
   }
 
+  async sadd(hash: string, values: string[]): Promise<number> {
+    try {
+      return await this.redis.sadd(hash, values);
+    } catch (error) {
+      if (error instanceof Error) {
+        this.logger.error('An error occurred while trying to sadd in redis.', {
+          hash,
+          values,
+          exception: error?.toString(),
+        });
+      }
+      throw error;
+    }
+  }
+
+  async srem(hash: string, values: string[]): Promise<number> {
+    try {
+      return await this.redis.srem(hash, values);
+    } catch (error) {
+      if (error instanceof Error) {
+        this.logger.error('An error occurred while trying to srem in redis.', {
+          hash,
+          values,
+          exception: error?.toString(),
+        });
+      }
+      throw error;
+    }
+  }
+
+  async sismember(hash: string, value: string): Promise<boolean> {
+    try {
+      return Boolean(await this.redis.sismember(hash, value));
+    } catch (error) {
+      if (error instanceof Error) {
+        this.logger.error(
+          'An error occurred while trying to sismember in redis.',
+          {
+            hash,
+            value,
+            exception: error?.toString(),
+          }
+        );
+      }
+      throw error;
+    }
+  }
+
   async expire(key: string, ttl: number): Promise<number> {
     return await this.redis.expire(key, ttl);
   }
