@@ -280,6 +280,23 @@ export class RedisService {
     }
   }
 
+  async smembers(hash: string): Promise<string[]> {
+    try {
+      return await this.redis.smembers(hash);
+    } catch (error) {
+      if (error instanceof Error) {
+        this.logger.error(
+          'An error occurred while trying to smembers in redis.',
+          {
+            hash,
+            exception: error?.toString(),
+          }
+        );
+      }
+      throw error;
+    }
+  }
+
   async sismember(hash: string, value: string): Promise<boolean> {
     try {
       return Boolean(await this.redis.sismember(hash, value));
